@@ -1,0 +1,22 @@
+﻿@{
+
+    try
+    {
+        var length = Convert.ToInt32(ViewData.ContainsKey("Length") ? ViewData["Length"].ToString() : string.Empty);
+        var value = ViewData.ContainsKey("Value") ? ViewData["Value"].ToString() : string.Empty;
+        @(value.Length < length ? value : value.Substring(0, length) + "...")
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine(e);
+    }
+}
+
+
+
+
+
+
+@* Usage
+    @Html.Partial("Shared/_TextTrimmerPartial", null, new ViewDataDictionary { { "Length", 30 }, { "Value", "abcdefg" } })
+*@

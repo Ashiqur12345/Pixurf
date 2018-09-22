@@ -1,0 +1,84 @@
+﻿@model string
+
+@{
+    /*
+    string style = "color: red;";
+    string title = "Added to Favourites. Click to remove from favourites";
+    */
+    
+    string style = "color: gray; opacity: 0.5;";
+    string title = "Add to Favourites";
+    
+}
+
+<a onclick="setFavState();" class="btn btn-default" title="@title" id="fav"><span style="@style" id="fav-icon" class="glyphicon glyphicon-heart"></span></a>
+
+<hr />
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script>
+    $(document).ready(function() {
+
+        $.ajax({
+            type: 'GET',
+            url: window.location.protocol + "//" + window.location.host + "/" + "api/Favourite/Get/@Model",
+
+            success: function(response) {
+                if (response.Status) {
+                    $("#fav").prop('title','Added to Favourites. Click to remove from favourites');
+                    $("#fav-icon").css('color', 'red');
+                    $("#fav-icon").css('opacity', '1.0');
+                } else {
+                    $("#fav").prop('title','Add to Favourites');
+                    $("#fav-icon").css('color', 'gray');
+                    $("#fav-icon").css('opacity', '0.5');
+                }
+            },
+            failure: function(response) {
+                $("#fav").prop('title','Add to Favourites');
+                $("#fav-icon").css('color', 'gray');
+                $("#fav-icon").css('opacity', '0.5');
+            },
+            error: function(response) {
+                $("#fav").prop('title','Add to Favourites');
+                $("#fav-icon").css('color', 'gray');
+                $("#fav-icon").css('opacity', '0.5');
+            }
+        });
+    })
+
+</script>
+
+<script>
+
+    function setFavState() {
+
+        var url = window.location.protocol + "//" + window.location.host + "/" + "api/Favourite/Set/@Model";
+
+        $.ajax({
+            type: 'PUT',
+            url: url,
+
+            success: function (response) {
+                if (response.Status) {
+                    $("#fav").prop('title','Added to Favourites. Click to remove from favourites');
+                    $("#fav-icon").css('color', 'red');
+                    $("#fav-icon").css('opacity', '1.0');
+                } else {
+                    $("#fav").prop('title','Add to Favourites');
+                    $("#fav-icon").css('color', 'gray');
+                    $("#fav-icon").css('opacity', '0.5');
+                }
+            },
+            failure: function (response) {
+                //Notify alert failure
+            },
+            error: function (response) {
+                //Notify alert error
+            }
+            
+        });
+        
+    }
+
+</script>

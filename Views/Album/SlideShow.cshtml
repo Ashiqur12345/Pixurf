@@ -1,0 +1,168 @@
+﻿@using System.Web.Configuration
+@model Pixurf.ViewModels.ViewAlbumModel
+    
+@{
+    ViewBag.Title = Model.Name + " - Slide Show";
+    Layout = null;
+}
+
+
+<head>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script type='text/javascript' src='~/Content/unitegallery/jquery-11.0.min.js'></script>
+
+    <script type='text/javascript' src='~/Content/unitegallery/unitegallery.js'></script>
+
+    <link rel='stylesheet' href='~/Content/unitegallery/unite-gallery.css' type='text/css' />
+
+    <script type='text/javascript' src='~/Content/unitegallery/default/ug-theme-default.js'></script>
+    <link rel='stylesheet' href='~/Content/unitegallery/default/ug-theme-default.css' type='text/css' />
+
+    <style>
+        body {
+            background-color: lavender;
+        }
+    </style>
+</head>
+<body>
+    @Html.Partial("../Shared/_NavbarPartial")
+<div style="text-align: center; width: 100%; height: 100%; margin-top: 80px">
+    <div id="gallery" style="display:none; margin: auto; ">
+
+        @{
+            string uploadRoot = "~/UserUploads/";
+
+            var strings = WebConfigurationManager.AppSettings.GetValues("UserUploadRoot");
+            if (strings != null)
+            {
+                uploadRoot = strings.First();
+            }
+
+            foreach (var content in Model.Contents)
+            {
+                var contentSrc = uploadRoot + content.User_ID + "/" + content.Path;
+                var thumbSrc = uploadRoot + content.User_ID + "/thumbs/thumb_" + content.Path;
+
+                var description = content.Description;
+                try { description = description.Replace(System.Environment.NewLine, "<br/>"); } catch (Exception e) { Console.WriteLine(e); }
+
+                <img alt="@content.Title"
+                     src="@thumbSrc"
+                     data-image="@contentSrc"
+                     data-description="@description"
+                     data-id="@content.Content_ID"
+                     data-title="@content.Title">
+            }
+        }
+    </div>
+    <div style="margin: auto">
+        <br><br>
+        <input type="button" value="Prev Image" onclick="api.prevItem()">
+        <input type="button" value="Play" onclick="api.play()">
+        <input type="button" value="Stop" onclick="api.stop()">
+        <input type="button" value="Next Image" onclick="api.nextItem()">
+        <br><br>
+        <input type="button" value="Zoom In" onclick="api.zoomIn()">
+        <input type="button" value="Reset Zoom" onclick="api.resetZoom()">
+        <input type="button" value="Zoom Out" onclick="api.zoomOut()">
+        <br><br>
+        <input type="button" value="Resize" onclick="api.resize(1000)">
+        <input type="button" value="Toggle Fullscreen" onclick="api.toggleFullscreen()">
+        @*<input type="button" value="Select Item" onclick="api.selectItem(4)">
+                <input type="button" value="Get Item" onclick="alert(api.getItem(4).title)">*@
+        <br><br>
+        <input type="button" value="Night Mode" id="theme" />
+    </div>
+
+</div>
+<script>
+    var color = 1;
+
+    $('#theme').click(
+        function () {
+            if (color == 1) {
+
+                $('body').animate({ backgroundColor: "rgb(45, 78, 78)" }, "slow");
+                $('.navbar').animate({ backgroundColor: "rgb(45, 78, 78)" }, "slow");
+                color = 0;
+                $('#theme').text('Day Mode');
+            }
+            else {
+                $('body').animate({ backgroundColor: "lavender" }, "slow");
+                $('.navbar').animate({ backgroundColor: "lavender" }, "slow");
+                color = 1;
+                $('#theme').text('Night Mode');
+            }
+        });
+
+    $(document).ready(function () {
+        console.log("ready!");
+        $('.navbar').css('background-color', 'lavender');
+    });
+</script>
+
+
+    <script type="text/javascript">
+        var api;
+
+        jQuery(document).ready(function () {
+            api = jQuery("#gallery").unitegallery({
+                gallery_width: 900,							//gallery width
+                gallery_height: 600,							//gallery height
+
+                gallery_min_width: 400,						//gallery minimal width when resizing
+                gallery_min_height: 300,					//gallery minimal height when resizing
+
+                gallery_autoplay: true,						//true / false - begin slideshow autoplay on start
+                gallery_play_interval: 2500,
+                gallery_skin: "default",
+                slider_textpanel_title: true
+            });
+
+
+            //those are the eventws you can use:
+
+            api.on("item_change", function (num, data) {		//on item change, get item number and item data
+
+                if (console)
+                    console.log(data);
+                //do something
+            });
+
+            api.on("resize", function () {				//on gallery resize
+                //do something
+            });
+
+            api.on("enter_fullscreen", function () {	//on enter fullscreen
+                //do something
+            });
+
+            api.on("exit_fullscreen", function () {	//on exit fulscreen
+                //do something
+            });
+
+            api.on("play", function () {				//on start playing
+                //do something
+            });
+
+            api.on("stop", function () {				//on stop playing
+                //do something
+            });
+
+            api.on("pause", function () {				//on pause playing
+                //do something
+            });
+
+            api.on("continue", function () {			//on continue playing
+                //do something
+            });
+
+
+        });
+
+
+    </script>
+
+
+</body>

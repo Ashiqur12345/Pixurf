@@ -1,0 +1,27 @@
+﻿    
+<div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-category=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            @Html.ActionLink("Pixurf", "Index", "Home", new {area = ""}, new {@class = "navbar-brand"})
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li>@Html.ActionLink("About", "About", "Home")</li>
+                <li><a href="/Content/Stumble" class="btn btn-lg btn-warning">Stumble</a></li>
+            </ul>
+            @Html.Partial("_LoginPartial")
+
+            <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                    @Html.Partial("_SearchPartial")
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

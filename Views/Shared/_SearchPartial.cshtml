@@ -1,0 +1,59 @@
+﻿<!--Searching-->
+                    
+<form class="navbar-form navbar-right" role="search" action="/Search/">
+    <div class="input-group" style="width: 320px; margin-left: 15px">
+        
+
+        <input type="text" class="form-control" placeholder="Search" name="query" id="query" list="searchKeys">
+
+        @*<datalist id="searchKeys">
+            <option value="val1">val1</option>
+            <option value="Sitemap.php">Sitemap</option>
+        </datalist>*@
+        <div class="input-group-btn">
+            <select class="form-control" name="category" style="width: 100px">
+                <option value="All" selected>All</option>
+                <option value="People">People</option>
+                <option value="Content">Content</option>
+                <option value="Album">Album</option>
+            </select>
+        </div>
+        <div class="input-group-btn">
+            <button class="btn btn-default" type="submit" style="width: 40px"><i class="glyphicon glyphicon-search"></i></button>
+        </div>
+
+    </div>
+</form>
+
+<script>
+
+    $("#query1111111111111111").on('keyup paste input', function () {
+
+        var key = $("#query").val().toString();
+
+        if (key.length < 3) return;
+        $.ajax({
+            type: 'GET',
+            url: window.location.protocol + "//" + window.location.host + "/Search/Keys/" + key,
+
+            success: function (response) {
+                var list = document.getElementById('searchKeys');
+
+                $(response).each(function(index, val) {
+                    console.log(val.toString());
+                });
+
+                $('#potentials').append("<option value='" + response + "'>");
+                
+            },
+            failure: function(response) {
+               
+            },
+            error: function(response) {
+                
+            }
+        });
+
+    });
+
+</script>

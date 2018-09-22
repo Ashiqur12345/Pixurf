@@ -1,0 +1,375 @@
+﻿@using System.Diagnostics
+@using System.Web.Configuration
+@using Microsoft.Ajax.Utilities
+@using Microsoft.AspNet.Identity
+@using Pixurf.DataModels
+@model Pixurf.ViewModels.ViewUserModel
+
+@{
+    ViewBag.Title = Model.Name;
+} 
+
+
+@*@{
+    var claimsIdentity = User.Identity as System.Security.Claims.ClaimsIdentity;
+
+    if (claimsIdentity != null)
+    {
+        var c = claimsIdentity.Claims.ToList().Find(claim => claim.Type == "Uname");
+
+        @(c != null ? @c.Value : "")
+    }
+}*@
+
+
+
+<div>
+    <h4 class="text-center">
+        @Model.Name
+        @{ if (!Model.MyProfile && User.Identity.IsAuthenticated){ @Html.Partial("../Shared/_FollowPartial", Model.User_ID) } }
+    </h4>
+
+    <hr />
+    @*<style>
+        .row {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display:         flex;
+        }
+        .row > [class*='col-'] {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>*@
+    <div class="row well">
+        <div class="col col-md-7">
+            <dl class="dl-horizontal">
+                @*<dt>
+                @Html.DisplayNameFor(model => model.User_ID)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.User_ID)
+            </dd>*@
+        
+                <dt></dt><dd><span style="font-weight: bold; font-size: 1em ">Basic Info</span></dd>
+        
+                <dt>
+                    <span class="glyphicon glyphicon-user"></span>
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Name)
+                </dd>
+
+                <dt>
+                    <span class="glyphicon glyphicon-envelope"></span>
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Email)
+                </dd>
+
+
+                <dt>
+                    <span class="glyphicon glyphicon-earphone"></span>
+                </dt>
+
+                <dd>
+                    @{
+                        if (Model.PhoneNumber.IsNullOrWhiteSpace())
+                        {
+                            if (Model.MyProfile)
+                            {
+                                <a href="#">Add a Phone Number</a>
+                            }
+                            else
+                            {
+                                <span style="color: gray">No Phone Number Added</span>
+                            }
+                        }
+                        else
+                        {
+                            @Html.DisplayFor(model => model.PhoneNumber)
+                        }
+                    }
+
+                </dd>
+
+                @*<dt>
+            <span class="glyphicon glyphicon-calendar"></span>
+        </dt>
+
+        <dd>
+            @Html.LabelFor(model => model.Joining_Date.Value)
+        </dd>*@
+    
+                <dt>
+                    <span class="glyphicon glyphicon-globe"></span>
+                </dt>
+
+                <dd>
+                    @{
+                        if (Model.Country.IsNullOrWhiteSpace())
+                        {
+                            if (Model.MyProfile)
+                            {
+                                <a href="#">Which conutry are you from?</a>
+                            }
+                            else
+                            {
+                                <span style="color: gray">No Information Found</span>
+                            }
+                        }
+                        else
+                        {
+                            @Html.DisplayFor(model => model.Country)
+                        }
+                    }
+                </dd>
+        
+
+                <dt>
+                    <span class="glyphicon glyphicon-pencil"></span>
+                </dt>
+                <dd>
+                    @{
+                        if (Model.About_Me.IsNullOrWhiteSpace())
+                        {
+
+                            if (Model.MyProfile)
+                            {
+                                <a href="#">Say something about you</a>
+                            }
+                            else
+                            {
+                                <span style="color: gray">No Information Found</span>
+                            }
+                        }
+                        else
+                        {
+                            @Html.DisplayFor(model => model.About_Me)
+                        }
+                    }
+                </dd>
+
+
+            </dl>
+        </div>
+        <div class="col col-md-5">
+            <dl class="dl-horizontal">
+        
+                <dt></dt>
+                <dd><span style="font-weight: bold; font-size: 1em ">Popularity</span></dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.Followers)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Followers) People
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.PopularContents)
+                </dt>
+
+                <dd>
+                    @Model.PopularContents.Count
+                </dd>
+
+            </dl>
+        </div>
+    </div>
+    <hr />
+    <h4 class="text-center">Popular Contents</h4>
+    <hr />
+    <link href="~/Content/style-imagethumbs-modals.css" rel="stylesheet" />
+    <div class="row">
+        @{
+
+            string uploadRoot = "~/UserUploads/";
+
+            var strings = WebConfigurationManager.AppSettings.GetValues("UserUploadRoot");
+            if (strings != null)
+            {
+                uploadRoot = strings.First();
+            }
+
+            //var i = 0;
+            foreach (Content content in Model.PopularContents)
+            {
+
+                var contentSrc = uploadRoot + content.User_ID + "/" + content.Path;
+                var thumbSrc = uploadRoot + content.User_ID + "/thumbs/thumb_" + content.Path;
+
+                var description = content.Description;
+                try{description = description.Replace(System.Environment.NewLine, "<br/>");}catch (Exception e){Console.WriteLine(e);}
+
+                <div class="col col-lg-3 col-md-4 col-sm-6 col-xs-8" style="padding: 5px">
+                    <div style="background-image: url('@thumbSrc');" class="tile" onclick="viewImage('@contentSrc','@content.Title', '@description', '@content.Content_ID');">
+                        <div class="info text-center">
+                            <h5>@Html.Partial("../Shared/_TextProcessorPartial", null, new ViewDataDictionary { { "Length", 30 }, { "Value", @content.Title } })</h5>
+                        </div>
+                    </div>
+                </div>
+
+                //i++;
+                //if (i == 10)
+                //{
+                //    break;
+                //}
+            }
+        }
+
+    </div>
+
+    @{
+        if (Model.PopularContents.Count > 0)
+        {
+            <div class="text-center">
+                <a class="btn btn-info" onclick="loadMore();">Load More</a>
+            </div>
+        }
+        <script>
+
+            function loadMore() {
+                alert("Coming Soon !");
+            }
+
+        </script>
+
+    }
+    <div id="myModal" class="modal">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="modalImg">
+        <div id="caption">
+            <p>Image info here</p>
+        </div>
+        <a href=""></a>
+    </div>
+
+    <script src="~/Scripts/_ImageViewInModal.js"></script>
+
+    <script>
+        function display(div) {
+            document.getElementById('form').style.display = "none";
+            document.getElementById('info').style.display = "none";
+            document.getElementById(div).style.display = "block";
+        }
+    </script>
+    <hr />
+    <h4 class="text-center">Albums</h4>
+    <hr />
+    
+    <div class="row">
+        @{
+            
+            if (Model != null && Model.Albums.Albums.Count > 0)
+            {
+                if (Model.Albums.Albums.Count > 0)
+                {
+                    foreach (Album album in Model.Albums.Albums)
+                    {
+                        <div class="col col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                            @*test*@
+
+                            <div id="@album.User_ID@album.Album_ID" class="carousel" data-ride="carousel">
+
+                                <!-- Wrapper for slides -->
+                                <div class="carousel-inner">
+                                    @{
+                                        bool admin = false;
+                                        using (PixurfDBContext db = new PixurfDBContext())
+                                        {
+                                            User user = db.Users.Find(User.Identity.GetUserId());
+                                            if (user != null)
+                                            {
+                                                admin = user.Admin;
+                                            }
+                                        }
+
+                                        if (album.Contents.Count > 0)
+                                        {
+                                            var i = 0;
+                                            foreach (Content content in album.Contents)
+                                            {
+                                                if (content.Status == 1 || admin)
+                                                {
+                                                    <div class="item@(i == 0 ? " active" : "")@{ i++; }">
+                                                        <img src="@uploadRoot@content.User_ID/thumbs/thumb_@content.Path" alt="@content.Title">
+                                                    </div>
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="item active">
+                                                <img src="~/Content/photo-camera.png" alt="This album is Empty">
+                                            </div>
+                                        }
+                                    }
+
+                                    @*<div class="item active">
+                                        <img src="la.jpg" alt="Los Angeles" style="width: 100%;">
+                                    </div>*@
+                                </div>
+
+                                <!-- Left and right controls -->
+                                <a class="left carousel-control" href="#@album.User_ID@album.Album_ID" data-slide="prev">
+                                    <span class="glyphicon glyphicon-chevron-left"></span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                                <a class="right carousel-control" href="#@album.User_ID@album.Album_ID" data-slide="next">
+                                    <span class="glyphicon glyphicon-chevron-right"></span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </div>
+                            @*<a href="/ShowContent/Album/?id=@album.Album.Album_ID">*@
+                            <a href="@Url.Action("View", "Album", new {id = album.Album_ID})">
+                                <div>
+                                    <h3>@album.Name</h3>
+                                    <p>@album.Description</p>
+                                    <h5>@album.Contents.Count Contents</h5>
+                                </div>
+                            </a>
+                        </div>
+
+                        @*test end*@
+                    }
+                }
+
+                else
+                {
+                    <div class="col col-lg-12">
+                        <h3>No Album Found</h3>
+                        <a href="@Url.Action("AddNew", "Album")" class="btn btn-primary">Create New Album</a>
+                    </div>
+                }
+            }
+        }
+
+    </div>
+    @{
+        if (Model.Albums.Albums.Count > 0)
+        {
+            <div class="text-center">
+                <a class="btn btn-info" onclick="loadMore();">View All</a>
+            </div>
+        }
+    }
+
+    <script>
+
+        function loadMore() {
+            alert("Coming Soon !");
+        }
+    </script>
+    
+    
+    
+    
+
+</div>
+

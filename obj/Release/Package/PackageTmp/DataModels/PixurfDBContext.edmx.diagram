@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="eafb571c10474bc0b21a64e8a1314842" Name="Diagram1">
+        <EntityTypeShape EntityType="PixurfModel.Album" Width="1.5" PointX="3" PointY="1.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="PixurfModel.Content" Width="1.5" PointX="5.25" PointY="2.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="PixurfModel.Favourite" PointX="7.5" PointY="3.375" Width="1.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="PixurfModel.User" Width="1.5" PointX="0.75" PointY="1.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="PixurfModel.User_Relation" Width="1.5" PointX="3" PointY="5" IsExpanded="true" />
+        <AssociationConnector Association="PixurfModel.FK_ALBUM_USER" ManuallyRouted="false" />
+        <AssociationConnector Association="PixurfModel.FK_CONTENT_ALBUM" ManuallyRouted="false" />
+        <AssociationConnector Association="PixurfModel.FK_CONTENT_USER" ManuallyRouted="false" />
+        <AssociationConnector ManuallyRouted="false" Association="PixurfModel.FK_FAVOURITE_CONTENT" />
+        <AssociationConnector ManuallyRouted="false" Association="PixurfModel.FK_FAVOURITE_USER" />
+        <AssociationConnector Association="PixurfModel.FK_USER_RELATION_RELATED_USER" ManuallyRouted="false" />
+        <AssociationConnector Association="PixurfModel.FK_USER_RELATION_USER" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

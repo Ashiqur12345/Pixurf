@@ -1,0 +1,121 @@
+﻿@using System.Web.Configuration
+@using Microsoft.Ajax.Utilities
+@using Microsoft.AspNet.Identity
+@using Pixurf.DataModels
+@using Pixurf.ViewModels
+@model Pixurf.ViewModels.ViewSearchModel
+<link href="~/Content/style-imagethumbs-modals.css" rel="stylesheet" />
+@*Page title is set in the COntroller*@
+
+@if (Model != null)
+{
+    <h4 class="text-center">Tag : "@Model.Query"</h4><hr />
+}
+
+@if (Model == null || (Model.Contents.Count == 0 && Model.Albums.Count == 0))
+{
+    @:Nothing Found
+}
+else
+{
+    //Show Contents
+   
+    if (Model.Contents != null && Model.Contents.Count != 0)
+    {
+        <h3 class="text-center">Contents</h3>
+        <div class="row" id="contentResults" >
+            @{
+                string uploadRoot = "~/UserUploads/";
+
+                var strings = WebConfigurationManager.AppSettings.GetValues("UserUploadRoot");
+                if (strings != null)
+                {
+                    uploadRoot = strings.First();
+                }
+
+                foreach (ViewContentSearch content in Model.Contents)
+                {
+                    var contentSrc = uploadRoot + content.OwnerId + "/" + content.Path;
+                    var thumbSrc = uploadRoot + content.OwnerId + "/thumbs/thumb_" + content.Path;
+
+                    var description = content.Description;
+                    try{description = description.Replace(System.Environment.NewLine, "<br/>");}catch (Exception e){Console.WriteLine(e);}
+
+                    <div class="col col-lg-3 col-md-4 col-sm-6 col-xs-8" style="padding: 5px">
+                        <div style="background-image: url('@thumbSrc');" class="tile" onclick="viewImage('@contentSrc','@content.Title', '@description', '@content.Id');">
+                            <div class="info text-center">
+                                    
+                                <h5>@Html.Partial("../Shared/_TextProcessorPartial", null, new ViewDataDictionary { { "Length", 30 }, { "Value", @content.Title } })</h5>
+                                <h5>
+                                    <a href="@Url.Action("Index", "Profile",new {ID = content.OwnerId})"><span class="glyphicon glyphicon-user"></span> 
+                                        @Html.Partial("../Shared/_TextProcessorPartial", null, new ViewDataDictionary { { "Length", 30 }, { "Value", @content.OwnerName } })
+                                    </a>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+            }
+                
+        </div>
+        <br/><div class="text-center"><button class="btn btn-info">Find More</button></div>
+        <hr/>
+    }
+    
+
+    //Show Albums
+    <style>
+        .albumstyle {
+            padding: 5px; 
+            background-color: gainsboro; 
+            border-radius: 5px; 
+            background-image: url('/Content/album.png');
+            background-repeat: no-repeat;
+            background-size: 150px 120px;
+            min-width: 200px;
+            min-height: 120px;
+            margin-bottom: 5px;
+        }
+    </style>
+
+    if (Model.Albums != null && Model.Albums.Count != 0)
+    {
+        <h3 class="text-center">Albums</h3>
+        <div class="row" id="albumResults">
+            @{
+                foreach (var album in Model.Albums)
+                {
+                    <div class="col col-md-6 col-sm-12 text-center">
+                        <div class="albumstyle">
+                            <div style="opacity: 1; padding-left: 150px" class="text-left">
+                                <h3><a href="/Album/View/@album.Id">@Html.Partial("../Shared/_TextProcessorPartial", null, new ViewDataDictionary { { "Length", 20 }, { "Value", album.Title } })</a></h3>
+                                
+                                <h6>@Html.Partial("../Shared/_TextProcessorPartial", null, new ViewDataDictionary { { "Length", 30 }, { "Value", album.Description } })</h6>
+                                <h6>
+                                    <a href="@Url.Action("Index", "Profile",new {ID = album.OwnerId})">
+                                        <span class="glyphicon glyphicon-user"></span> @Html.Partial("../Shared/_TextProcessorPartial", null, new ViewDataDictionary { { "Length", 20 }, { "Value", album.OwnerName } })
+                                    </a>
+                                    @if(User.Identity.IsAuthenticated && User.Identity.GetUserId() != album.OwnerId) {@Html.Partial("../Shared/_FollowPartial", album.OwnerId)}
+                                </h6>
+                            </div>
+                            
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        <br/><div class="text-center"><button class="btn btn-info">Find More</button></div>
+        
+    }
+}
+
+<div id="myModal" class="modal">
+    <span class="close-modal">&times;</span>
+    <img class="modal-content" id="modalImg">
+    <div id="caption">
+        <p>Image info here</p>
+    </div>
+    <a href=""></a>
+</div>
+<script src="~/Scripts/_ImageViewInModal.js"></script>

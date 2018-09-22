@@ -1,0 +1,78 @@
+﻿@using Microsoft.AspNet.Identity
+@using Pixurf.DataModels
+@model Pixurf.ViewModels.ViewUploadContentModel
+
+@{
+    ViewBag.Title = "Upload Content";
+} 
+
+@using (Html.BeginForm("Upload", "Content", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4 class="text-center">Upload Content</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AlbumName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+
+                <input type="text" class="form-control" id="AlbumName" name="AlbumName" list="AlbumNameOptions" required>
+                <datalist id="AlbumNameOptions">
+                    @{
+                        using (PixurfDBContext db = new PixurfDBContext())
+                        {
+                            string userId = User.Identity.GetUserId();
+
+                            List<Album> albums = db.Albums.Where(a => a.User.User_ID.Equals(userId) && a.Status == 1).ToList();
+
+                            if (albums.Count > 0)
+                            {
+                                foreach (Album album in albums)
+                                {
+                                    <option value="@album.Name"> @album.Name</option>
+                                }
+                            }
+                        }
+                    }
+
+                </datalist>
+
+                @Html.ValidationMessageFor(model => model.AlbumName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Access, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select class="form-control" id="Access" name="Access">
+                    <option value="Public">Public</option>
+                    <option value="Private">Private</option>
+                    <option value="Follower">Followers</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.Access, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ImageFiles, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="file" id="Images" name="ImageFiles" multiple class="btn btn-default" display="none" />
+                @Html.ValidationMessageFor(model => model.ImageFiles, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Upload" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+                        }
+

@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+</head>
+<body>
+    @Html.Partial("../Shared/_NavbarPartial")
+    @Html.Partial("../Shared/_AlertPanelPartial")
+    <div class="container">
+        <hr />
+        @RenderBody()
+        <hr />
+    </div>   
+    
+    <footer>
+        @Html.Partial("../Shared/_FooterPartial")
+    </footer>
+    
+
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+﻿@using Pixurf.Models
+
+<div class="container" id="alerts">
+    @{
+        if (Session["Reports"] != null)
+        {
+            List<StatusReport> reports = Session["Reports"] as List<StatusReport>;
+            if (reports != null && reports.Count > 0)
+            {
+                var i = 0;
+                foreach (StatusReport report in reports)
+                {
+                    <div class="alert alert-@report.Status text-center" id="report_@i">
+                        <a href="#" class="close" onclick="closeAlert('report_@i')" aria-label="close">&times;</a>
+                        <strong>@report.Title!</strong> @report.Description
+                    </div>
+
+                    i++;
+                }
+            }
+            Session["Reports"] = null;
+        }
+    }
+</div>
+
+<script>
+
+    function closeAlert(id) {
+        //document.getElementById(id).style.display = 'none';
+        document.getElementById(id).outerText= '';
+    }
+
+</script>

@@ -1,0 +1,67 @@
+﻿@model string
+@{
+    var s = @DateTime.Now.Millisecond;
+}
+<a href="#" class="btn btn-xs follow@(Model)" onclick="setFollowState@(s)();">Follow</a>
+
+<script>
+    $(document).ready(function() {
+
+        $.ajax({
+            type: 'GET',
+            url: window.location.protocol + "//" + window.location.host + "/" + "api/Relation/Get/@Model",
+
+            success: function(response) {
+                if (response.Status) {
+                    $(".follow@(Model)").text('Following');
+                    $(".follow@(Model)").addClass('btn-success');
+                } else {
+                    $(".follow@(Model)").text('Follow');
+                    $(".follow@(Model)").addClass('btn-primary');
+                }
+            },
+            failure: function(response) {
+                $(".follow@(Model)").text('Follow');
+                $(".follow@(Model)").addClass('btn-primary');
+            },
+            error: function(response) {
+                $(".follow@(Model)").text('Follow');
+                $(".follow@(Model)").addClass('btn-primary');
+            }
+        });
+    })
+
+    function setFollowState@(s)() {
+
+        var url = window.location.protocol + "//" + window.location.host + "/" + "api/Relation/Set/@Model";
+
+        $.ajax({
+            type: 'PUT',
+            url: url,
+
+            success: function (response) {
+                if (response.Status) {
+                    //Notify alert success
+                    $(".follow@(Model)").text('Following');
+                    $(".follow@(Model)").removeClass('btn-primary');
+                    $(".follow@(Model)").addClass('btn-success');
+                }
+                else {
+                    $(".follow@(Model)").text('Follow');
+                    $(".follow@(Model)").removeClass('btn-success');
+                    $(".follow@(Model)").addClass('btn-primary');
+                }
+            },
+            failure: function (response) {
+                //Notify alert failure
+            },
+            error: function (response) {
+                //Notify alert error
+            }
+
+
+        });
+        $("#follow").text('Waiting');
+    }
+
+</script>

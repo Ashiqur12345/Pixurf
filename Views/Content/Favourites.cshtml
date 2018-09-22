@@ -1,0 +1,88 @@
+﻿@using System.Web.Configuration
+@using Microsoft.AspNet.Identity
+@using Pixurf.DataModels
+
+@model List<Content>
+
+@{
+    ViewBag.Title = "Favourites";
+}    
+
+<link href="~/Content/style-imagethumbs-modals.css" rel="stylesheet" />
+<link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+
+<h4 class="text-center">Favourite Contents</h4><hr />
+<div class="row">
+    @{
+
+        string uploadRoot = "~/UserUploads/";
+
+        var strings = WebConfigurationManager.AppSettings.GetValues("UserUploadRoot");
+        if (strings != null)
+        {
+            uploadRoot = strings.First();
+        }
+
+        //var i = 0;
+        foreach (Content content in Model)
+        {
+
+            var contentSrc = uploadRoot + content.User_ID + "/" + content.Path;
+            var thumbSrc = uploadRoot + content.User_ID + "/thumbs/thumb_" + content.Path;
+
+            var description = content.Description;
+            try{description = description.Replace(System.Environment.NewLine, "<br/>");}catch (Exception e){Console.WriteLine(e);}
+
+            <div class="col col-lg-3 col-md-4 col-sm-6 col-xs-8" style="padding: 5px">
+                <div style="background-image: url('@thumbSrc');" class="tile" onclick="viewImage('@contentSrc','@content.Title', '@description', '@content.Content_ID');">
+                    <div class="info text-center">
+                        <h5>@Html.Partial("../Shared/_TextProcessorPartial", null, new ViewDataDictionary { { "Length", 30 }, { "Value", @content.Title } })</h5>
+                    </div>
+                </div>
+            </div>
+
+            //i++;
+            //if (i == 10)
+            //{
+            //    break;
+            //}
+        }
+    }
+
+</div>
+
+@{
+    if (Model.Count > 0)
+    {
+        <div class="text-center">
+            <a class="btn btn-info" onclick="loadMore();">Load More</a>
+        </div>
+    }
+    <script>
+
+        function loadMore() {
+            alert("Coming Soon !");
+        }
+
+    </script>
+
+}
+
+<div id="myModal" class="modal">
+    <span class="close-modal">&times;</span>
+    <img class="modal-content" id="modalImg">
+    <div id="caption">
+        <p>Image info here</p>
+    </div>
+    <a href=""></a>
+</div>
+
+<script src="~/Scripts/_ImageViewInModal.js"></script>
+
+<script>
+    function display(div) {
+        document.getElementById('form').style.display = "none";
+        document.getElementById('info').style.display = "none";
+        document.getElementById(div).style.display = "block";
+    }
+</script>

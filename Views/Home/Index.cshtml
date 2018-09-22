@@ -1,0 +1,51 @@
+﻿@using System.Web.Configuration
+@model Pixurf.ViewModels.ViewContentModel
+
+
+@{
+    ViewBag.Title = "Pixurf";
+}
+<div class="text-center row">
+    <div class="col col-lg-12">
+        <img src="~/Content/logo-name.png" width="200"/>
+    </div>
+</div>
+<div class="container">
+    
+    @{
+        if (Model != null)
+        {
+            string uploadRoot = "~/UserUploads/";
+
+            var strings = WebConfigurationManager.AppSettings.GetValues("UserUploadRoot");
+            if (strings != null)
+            {
+                uploadRoot = strings.First();
+            }
+
+            
+                <div class="lead text-center">
+                    <div class="row">
+                        <a href="/Content/View/@Model.Content_ID">
+                            
+                            <div class="col col-lg-12">
+
+                                <img id="img" style="width: inherit; max-height: 600px; max-width: 100%"
+                                     class="panel panel-primary"
+                                     src="@(uploadRoot + Model.User.User_ID + "/" + Model.Path)"
+                                     alt="@Model.Title by @Model.User.Name" />
+
+                            </div>
+                        </a>
+                        <div class="text-center">Pic of the day: <strong>@Model.Title</strong> by <a href="~/Profile/Index/@Model.User.User_ID">@Model.User.Name</a></div>
+                    </div>
+                </div>
+            
+            
+        }
+
+        <p class="text-center"><a href="/Account/Register/">Join</a> and <a href="/Content/Upload">Upload</a> contents to see it in our homepage</p>
+
+    }
+
+</div>

@@ -1,0 +1,261 @@
+﻿@using System.Web.Configuration
+@using Microsoft.AspNet.Identity
+@using Pixurf.DataModels
+@model Pixurf.ViewModels.ViewContentModel
+
+@{
+    ViewBag.Title = Model.Title;
+} 
+
+@{
+    var claimsIdentity = User.Identity as System.Security.Claims.ClaimsIdentity;
+    bool admin = false;
+    if (claimsIdentity != null)
+    {
+        var c = claimsIdentity.Claims.ToList().Find(claim => claim.Type == "Admin");
+
+        if (c != null)
+        {
+            admin = Boolean.Parse(c.Value);
+        }
+    }
+}
+
+<div>
+    <h4 class="text-center">@Model.Title</h4>
+    <hr />
+
+    <div class="row well">
+        <div class="col col-md-4">
+            <div class="row" style="display: block" id="info">
+                <div class="col col-lg-12 collapse in" id="target">
+                    <dl class="dl-horizontal">
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Title)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Title)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Description)
+                        </dt>
+
+                        <dd>
+                            @Html.Partial("../Shared/_TaggerPartial", "" + Model.Description)
+                        </dd>
+
+                        <dt>
+                            Owner
+                        </dt>
+
+                        <dd>
+                            <a href="@Url.Action("Index", "Profile",new {ID = Model.User.User_ID})">@Model.User.Name</a>
+                           
+                            @{
+                                if (Model.Album.User_ID != User.Identity.GetUserId())
+                                {
+                                    @Html.Partial("../Shared/_FollowPartial", Model.Album.User_ID)
+                                }
+                            }
+
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Creation_Date)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Creation_Date.GetDateTimeFormats()[9])
+                        </dd>
+
+                        <dt>
+                            Album
+                        </dt>
+
+                        <dd>
+                            <a href="@Url.Action("View","Album", new {id = Model.Album.Album_ID})">@Model.Album.Name</a>
+                        </dd>
+
+                        <dt>
+                            Shared With
+                        </dt>
+
+                        <dd>
+                            @Model.Access
+                        </dd>
+                        
+                        @{
+                            if (admin)
+                            {
+                                <dt>
+                                    @Html.DisplayNameFor(model => model.Status)
+                                </dt>
+
+                                <dd>
+                                    @(Model.Status == 1 ? "Available" : "Deleted")
+                                </dd>
+                            }
+                        }
+                    </dl>
+                </div>
+                <div class="text-center">
+                    <button type="button" class="btn btn-default btn-xs" data-toggle="collapse" data-target="#target">Show/Hide Info</button>
+                    <hr />
+                </div>
+                
+                <div id="comments" class="col col-lg-12 text-center">
+                    <a class="btn btn-primary btn-sm" onclick="">Load Comments</a>
+                </div>
+            </div>
+
+            <div style="display: none" id="form">
+                @{
+                    if (Model.UserAuthenticated || admin)
+                    {
+            
+                        using (Html.BeginForm("Edit", "Content", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <div class="form-horizontal">
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                                <div class="form-group" hidden>
+                                    <input id="Content_ID" name="Content_ID" value="@Model.Content_ID" />
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        <textarea id="Description" name="Description" class="form-control" rows="5">@Model.Description</textarea>
+                                        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Access, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        <select class="form-control" id="Access" name="Access">
+                                            <option value="Public" @(Model.Access.Equals("Public") ? "Selected" : "")>Public</option>
+                                            <option value="Private" @(Model.Access.Equals("Private") ? "Selected" : "")>Private</option>
+                                            <option value="Follower" @(Model.Access.Equals("Follower") ? "Selected" : "")>Followers</option>
+                                        </select>
+                                        @Html.ValidationMessageFor(model => model.Access, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.AlbumName, htmlAttributes: new {@class = "control-label col-md-4"})
+                                    <div class="col-md-8">
+                
+                                        <input type="text" class="form-control" id="AlbumName" name="AlbumName" list="AlbumNameOptions" required value="@Model.Album.Name">
+                                        <datalist id="AlbumNameOptions">
+                                            @{
+                                                using (PixurfDBContext db = new PixurfDBContext())
+                                                {
+                                                    string userId = User.Identity.GetUserId();
+
+                                                    List<Album> albums = db.Albums.Where(a => a.User.User_ID.Equals(userId)).ToList();
+
+                                                    foreach (Album album in albums)
+                                                    { 
+                                                        <option value="@album.Name"> @album.Name</option>
+                                                    }
+                                                }
+                                            }
+
+                                        </datalist>
+                                        @Html.ValidationMessageFor(model => model.AlbumName, "", new {@class = "text-danger"})
+                                    </div>
+                                </div>
+                    
+                                <div class="form-group">
+                                    <div class="col-md-offset-4 col-md-8">
+                                        <button class="btn btn-info"><span class="glyphicon glyphicon-floppy"></span> Save Changes</button>
+                                        <a class="btn btn-default" onclick="display('info')">Cancel</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+        </div>
+        
+        <div class="col col-md-8">
+
+            @{
+                string uploadRoot = "~/UserUploads/";
+
+                var strings = WebConfigurationManager.AppSettings.GetValues("UserUploadRoot");
+                if (strings != null)
+                {
+                    uploadRoot = strings.First();
+                }
+                
+                <div class="col col-lg-12 text-right">
+                    @{
+
+                        if (Model.UserAuthenticated || admin)
+                        {
+                            <a onclick="display('form');" class="btn btn-default" title="Edit Info"><span class="glyphicon glyphicon-edit" style="color: brown"></span></a>
+                            <a href="/Content/Delete/@Model.Content_ID" onclick="return confirm('Are you sure?');" class="btn btn-default" title="Delete"><span class="glyphicon glyphicon-trash" style="color: red"></span></a>
+
+
+                            <a href="/Content/Download/@Model.Content_ID" class="btn btn-default" title="Download"><span class="glyphicon glyphicon-floppy-save" style="color: black"></span></a>
+                            @*<a href="/path/to/image" download="ImageName" title="ImageName">
+                                        <img src="/path/to/image" alt="ImageName">
+                                </a>*@
+
+                        }
+                        
+                    }
+                    @Html.Partial("../Shared/_FavouritePartial", Model.Content_ID.ToString())
+                </div>
+                <div style="max-width: 100%; max-height: 100%;" class="text-center">
+                    <img id="img" class="view-image panel panel-primary" src="@(uploadRoot + Model.User.User_ID + "/" + Model.Path)" />
+
+                </div>
+                
+                <style>
+                    .view-image {
+                        cursor: url("../../Content/clip-arts/plus_cursor.png") 25 25, auto;
+                        display: inline-block;
+                        background-size: cover;
+                        background-position: 50% 50%;
+                        margin-left: 8px;
+                        margin-right: 8px;
+                        margin-bottom: 16px;
+                        max-width: 100%;
+                        max-height: 700px;
+                    }
+                </style>
+            }
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/_ImageFullscreen.js"></script>
+<script>
+    window.onload = function() {
+        var elements = document.querySelectorAll( '.view-image' );
+        Intense( elements );
+    }
+</script>
+<script>
+    function display(div) {
+        document.getElementById('form').style.display = "none";
+        document.getElementById('info').style.display = "none";
+        document.getElementById(div).style.display = "block";
+    }
+</script>

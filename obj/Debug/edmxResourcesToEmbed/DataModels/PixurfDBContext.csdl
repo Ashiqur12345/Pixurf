@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="PixurfModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Album">
+    <Key>
+      <PropertyRef Name="Album_ID" />
+    </Key>
+    <Property Name="Album_ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Description" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+    <Property Name="Creation_Date" Type="DateTime" Nullable="false" Precision="0" />
+    <Property Name="Status" Type="Byte" Nullable="false" />
+    <Property Name="Access" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="User_ID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+    <NavigationProperty Name="User" Relationship="Self.FK_ALBUM_USER" FromRole="Album" ToRole="User" />
+    <NavigationProperty Name="Contents" Relationship="Self.FK_CONTENT_ALBUM" FromRole="Album" ToRole="Content" />
+  </EntityType>
+  <EntityType Name="Content">
+    <Key>
+      <PropertyRef Name="Content_ID" />
+    </Key>
+    <Property Name="Content_ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Title" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+    <Property Name="Description" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+    <Property Name="Path" Type="String" MaxLength="2000" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Access" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Type" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+    <Property Name="Status" Type="Byte" Nullable="false" />
+    <Property Name="Creation_Date" Type="DateTime" Nullable="false" Precision="0" />
+    <Property Name="User_ID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Album_ID" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Album" Relationship="Self.FK_CONTENT_ALBUM" FromRole="Content" ToRole="Album" />
+    <NavigationProperty Name="User" Relationship="Self.FK_CONTENT_USER" FromRole="Content" ToRole="User" />
+    <NavigationProperty Name="Favourites" Relationship="Self.FK_FAVOURITE_CONTENT" FromRole="Content" ToRole="Favourite" />
+  </EntityType>
+  <EntityType Name="Favourite">
+    <Key>
+      <PropertyRef Name="User_ID" />
+      <PropertyRef Name="Content_ID" />
+    </Key>
+    <Property Name="User_ID" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" Type="String" />
+    <Property Name="Content_ID" Nullable="false" Type="Int32" />
+    <Property Name="Creation_Date" Nullable="false" Precision="3" Type="DateTime" />
+    <NavigationProperty Name="Content" Relationship="Self.FK_FAVOURITE_CONTENT" FromRole="Favourite" ToRole="Content" />
+    <NavigationProperty Name="User" Relationship="Self.FK_FAVOURITE_USER" FromRole="Favourite" ToRole="User" />
+  </EntityType>
+  <EntityType Name="User">
+    <Key>
+      <PropertyRef Name="User_ID" />
+    </Key>
+    <Property Name="User_ID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Email" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+    <Property Name="EmailConfirmed" Type="Boolean" Nullable="false" />
+    <Property Name="PasswordHash" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="SecurityStamp" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="PhoneNumber" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="PhoneNumberConfirmed" Type="Boolean" Nullable="false" />
+    <Property Name="TwoFactorEnabled" Type="Boolean" Nullable="false" />
+    <Property Name="LockoutEndDateUtc" Type="DateTime" Precision="3" />
+    <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
+    <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
+    <Property Name="UserName" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="About_Me" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="Joining_Date" Type="DateTime" Precision="3" />
+    <Property Name="Country" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="Pro_Pic_ID" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="Status" Type="Boolean" Nullable="false" />
+    <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="Admin" Type="Boolean" Nullable="false" />
+    <NavigationProperty Name="Albums" Relationship="Self.FK_ALBUM_USER" FromRole="User" ToRole="Album" />
+    <NavigationProperty Name="Contents" Relationship="Self.FK_CONTENT_USER" FromRole="User" ToRole="Content" />
+    <NavigationProperty Name="Favourites" Relationship="Self.FK_FAVOURITE_USER" FromRole="User" ToRole="Favourite" />
+    <NavigationProperty Name="User_Relation" Relationship="Self.FK_USER_RELATION_RELATED_USER" FromRole="User" ToRole="User_Relation" />
+    <NavigationProperty Name="User_Relation1" Relationship="Self.FK_USER_RELATION_USER" FromRole="User" ToRole="User_Relation" />
+  </EntityType>
+  <EntityType Name="User_Relation">
+    <Key>
+      <PropertyRef Name="User_ID" />
+      <PropertyRef Name="Related_User_ID" />
+    </Key>
+    <Property Name="User_ID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Related_User_ID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Status" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
+    <NavigationProperty Name="User" Relationship="Self.FK_USER_RELATION_RELATED_USER" FromRole="User_Relation" ToRole="User" />
+    <NavigationProperty Name="User1" Relationship="Self.FK_USER_RELATION_USER" FromRole="User_Relation" ToRole="User" />
+  </EntityType>
+  <Association Name="FK_ALBUM_USER">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="Album" Type="Self.Album" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="User_ID" />
+      </Principal>
+      <Dependent Role="Album">
+        <PropertyRef Name="User_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_CONTENT_ALBUM">
+    <End Role="Album" Type="Self.Album" Multiplicity="1" />
+    <End Role="Content" Type="Self.Content" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Album">
+        <PropertyRef Name="Album_ID" />
+      </Principal>
+      <Dependent Role="Content">
+        <PropertyRef Name="Album_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_CONTENT_USER">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="Content" Type="Self.Content" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="User_ID" />
+      </Principal>
+      <Dependent Role="Content">
+        <PropertyRef Name="User_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_FAVOURITE_CONTENT">
+    <End Type="Self.Content" Multiplicity="1" Role="Content" />
+    <End Type="Self.Favourite" Multiplicity="*" Role="Favourite" />
+    <ReferentialConstraint>
+      <Principal Role="Content">
+        <PropertyRef Name="Content_ID" />
+      </Principal>
+      <Dependent Role="Favourite">
+        <PropertyRef Name="Content_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_FAVOURITE_USER">
+    <End Type="Self.User" Multiplicity="1" Role="User" />
+    <End Type="Self.Favourite" Multiplicity="*" Role="Favourite" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="User_ID" />
+      </Principal>
+      <Dependent Role="Favourite">
+        <PropertyRef Name="User_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_USER_RELATION_RELATED_USER">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="User_Relation" Type="Self.User_Relation" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="User_ID" />
+      </Principal>
+      <Dependent Role="User_Relation">
+        <PropertyRef Name="Related_User_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_USER_RELATION_USER">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="User_Relation" Type="Self.User_Relation" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="User_ID" />
+      </Principal>
+      <Dependent Role="User_Relation">
+        <PropertyRef Name="User_ID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="PixurfDBContext" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Albums" EntityType="Self.Album" />
+    <EntitySet Name="Contents" EntityType="Self.Content" />
+    <EntitySet Name="Favourites" EntityType="Self.Favourite" />
+    <EntitySet Name="Users" EntityType="Self.User" />
+    <EntitySet Name="User_Relations" EntityType="Self.User_Relation" />
+    <AssociationSet Name="FK_ALBUM_USER" Association="Self.FK_ALBUM_USER">
+      <End Role="User" EntitySet="Users" />
+      <End Role="Album" EntitySet="Albums" />
+    </AssociationSet>
+    <AssociationSet Name="FK_CONTENT_ALBUM" Association="Self.FK_CONTENT_ALBUM">
+      <End Role="Album" EntitySet="Albums" />
+      <End Role="Content" EntitySet="Contents" />
+    </AssociationSet>
+    <AssociationSet Name="FK_CONTENT_USER" Association="Self.FK_CONTENT_USER">
+      <End Role="User" EntitySet="Users" />
+      <End Role="Content" EntitySet="Contents" />
+    </AssociationSet>
+    <AssociationSet Name="FK_FAVOURITE_CONTENT" Association="Self.FK_FAVOURITE_CONTENT">
+      <End EntitySet="Contents" Role="Content" />
+      <End EntitySet="Favourites" Role="Favourite" />
+    </AssociationSet>
+    <AssociationSet Name="FK_FAVOURITE_USER" Association="Self.FK_FAVOURITE_USER">
+      <End EntitySet="Users" Role="User" />
+      <End EntitySet="Favourites" Role="Favourite" />
+    </AssociationSet>
+    <AssociationSet Name="FK_USER_RELATION_RELATED_USER" Association="Self.FK_USER_RELATION_RELATED_USER">
+      <End Role="User" EntitySet="Users" />
+      <End Role="User_Relation" EntitySet="User_Relations" />
+    </AssociationSet>
+    <AssociationSet Name="FK_USER_RELATION_USER" Association="Self.FK_USER_RELATION_USER">
+      <End Role="User" EntitySet="Users" />
+      <End Role="User_Relation" EntitySet="User_Relations" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

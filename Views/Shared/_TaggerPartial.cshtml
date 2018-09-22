@@ -1,0 +1,35 @@
+﻿@using System.Text.RegularExpressions
+@model string
+    
+@*@Model Works*@
+
+@{
+    if (!String.IsNullOrWhiteSpace(Model))
+    {
+        var c = Regex.Matches(Model, @"#\w+", RegexOptions.IgnoreCase);
+        string replace = Model;
+
+        foreach (Match match in c)
+        {
+            string str = "<a class='tag' href='/Tag/" + match.Value.Split('#')[1] + "'>" + match.Value + "</a>";
+            replace = Regex.Replace(replace, match.Value, str, RegexOptions.IgnoreCase);
+        }
+
+        @Html.Raw(replace)
+    }
+
+}
+
+<style>
+    .tag {
+        color:brown;
+        background: lightblue;
+    }
+
+    .tag:hover {
+        color:indianred;
+        font-weight: bold;
+        background: lightblue;
+    }
+
+</style>

@@ -1,0 +1,77 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNet.Identity
+@using Pixurf.DataModels
+@if (Request.IsAuthenticated)
+{
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <ul class="nav navbar-nav navbar-right">
+            
+            <li class="dropdown" title="Menu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                    <img class="img-circle" src="~/Content/avatar.png" width="20" />
+                    @{
+                        var claimsIdentity = User.Identity as System.Security.Claims.ClaimsIdentity;
+
+                        if (claimsIdentity != null)
+                        {
+                            var c = claimsIdentity.Claims.ToList().Find(claim => claim.Type == "Uname");
+
+                            @(c != null ? @c.Value : "")
+                        }
+                    }
+
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <a href="/Profile/" title="View Profile Information">
+                            <span class="glyphicon glyphicon-user"></span> My profile
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index","Album")" title="Manage Your Albums">
+                            <span class="glyphicon glyphicon-book"></span> Albums
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Content/Favourites" title="View Favourite Contents">
+                            <span class="glyphicon glyphicon-heart"></span> Favourites
+                        </a>
+                    </li>
+                    <li>
+                        @*<a href="@Url.Action("Index", "Manage")" title="Account Settings">
+                            <span class="glyphicon glyphicon-cog"></span> Settings
+                        </a>*@
+                        
+                        <a href="@Url.Action("Manage", "Profile")" title="Account Settings">
+                            <span class="glyphicon glyphicon-cog"></span> Settings
+                        </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a href="@Url.Action("Upload", "Content")" title="Upload">
+                            <span class="glyphicon glyphicon-cloud-upload"></span> Upload
+                        </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a href="javascript:document.getElementById('logoutForm').submit()">
+                            <span class="glyphicon glyphicon-log-out"></span> Log Out
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+    }
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+    </ul>
+}

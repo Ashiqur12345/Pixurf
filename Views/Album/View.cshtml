@@ -1,0 +1,234 @@
+﻿@using System.Web.Configuration
+@using Microsoft.AspNet.Identity
+@using Pixurf.DataModels
+
+@model Pixurf.ViewModels.ViewAlbumModel
+
+@{
+    ViewBag.Title = Model.Name + " - Album";
+}    
+
+<link href="~/Content/style-imagethumbs-modals.css" rel="stylesheet" />
+<link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+
+@{
+    var claimsIdentity = User.Identity as System.Security.Claims.ClaimsIdentity;
+    bool admin = false;
+    if (claimsIdentity != null)
+    {
+        var c = claimsIdentity.Claims.ToList().Find(claim => claim.Type == "Admin");
+
+        if (c != null)
+        {
+            admin = Boolean.Parse(c.Value);
+        }
+    }
+}
+
+<div class="row text-left">
+    <h4 class="text-center">@Model.Name</h4><hr />
+    <div style="display: block" id="info" class="col col-lg-12 well">
+        <dl class="dl-horizontal collapse in" id="target">
+            
+            <dt>
+                Owner
+            </dt>
+
+            <dd>
+                <a href="@Url.Action("Index", "Profile",new {ID = Model.User.User_ID})">@Model.User.Name</a>
+                
+                @{
+                    if (Model.User.User_ID != User.Identity.GetUserId())
+                    {
+                        @Html.Partial("../Shared/_FollowPartial", Model.User.User_ID)
+                    }
+                }
+            </dd>
+            <dt>
+                No. of Contents
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Contents.Count)
+            </dd>
+            
+            <dt>
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+
+            <dd>
+                @Html.Partial("../Shared/_TaggerPartial", ""+Model.Description)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Access)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Access)
+            </dd>
+            
+            @{
+                if (admin)
+                {
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Status)
+                    </dt>
+
+                    <dd>
+                        @(Model.Status == 1 ? "Available" : "Deleted")
+                    </dd>
+                }
+            }
+            <dt></dt>
+            <dd>
+                @{
+                    if (Model.User.User_ID == User.Identity.GetUserId())
+                    {
+                        <a onclick="display('form');" class="btn btn-default btn-sm" title="Edit Info">Edit Info</a>
+                    }
+                }
+                
+                <a href="~/Album/SlideShow/@Model.Album_ID" class="btn btn-default btn-sm" 
+                   style="background-color:darkorange;" 
+                   onmouseover="this.style.backgroundColor='orange'" 
+                   onmouseout="this.style.backgroundColor='darkorange'"
+                   title="View slide show of this album">Slide Show</a>
+            </dd>
+        </dl>
+        <div class="text-center">
+            <button type="button" class="btn btn-default btn-xs" data-toggle="collapse" data-target="#target">Show/Hide Info</button>
+            <hr/>
+        </div>
+    </div>
+    <div id="form" style="display: none" class="col col-lg-12 well">
+        @{
+            if (Model.UserAuthenticated || admin)
+            {
+                using (Html.BeginForm("Edit", "Album", FormMethod.Post)) 
+                 {
+                     @Html.AntiForgeryToken()
+    
+                     <div class="form-horizontal row">
+                         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                         
+                         <div class="form-group" hidden>
+                             <input id="Album_ID" name="Album_ID" value="@Model.Album_ID" />
+                         </div>
+
+                         <div class="form-group">
+                             @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+                             <div class="col-md-10">
+                                 @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                                 @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                             </div>
+                         </div>
+
+                         <div class="form-group">
+                             @Html.LabelFor(model => model.Access, htmlAttributes: new { @class = "control-label col-md-2" })
+                             <div class="col-md-10">
+                                 <select class="form-control" id="Access" name="Access">
+                                     <option value="Public" @(Model.Access.Equals("Public") ? "Selected" : "")>Public</option>
+                                     <option value="Private" @(Model.Access.Equals("Private") ? "Selected" : "")>Private</option>
+                                     <option value="Follower" @(Model.Access.Equals("Follower") ? "Selected" : "")>Followers</option>
+                                 </select>
+                                 @Html.ValidationMessageFor(model => model.Access, "", new { @class = "text-danger" })
+                             </div>
+                         </div>
+
+                         <div class="form-group">
+                             @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+                             <div class="col-md-10">
+                                 <textarea id="Description" name="Description" class="form-control" rows="5">@Model.Description</textarea>
+                                 @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                             </div>
+                         </div>
+        
+                         <div class="form-group">
+                             <div class="col-md-offset-2 col-md-10">
+                                 <button class="btn btn-info"><span class="glyphicon glyphicon-floppy"></span> Save Changes</button>
+                                 <a class="btn btn-default" onclick="display('info')">Cancel</a>
+                             </div>
+                         </div>
+                     </div>
+                 }
+            }
+        }
+    </div>
+</div>
+
+
+
+<div class="row">
+    @{
+
+        string uploadRoot = "~/UserUploads/";
+
+        var strings = WebConfigurationManager.AppSettings.GetValues("UserUploadRoot");
+        if (strings != null)
+        {
+            uploadRoot = strings.First();
+        }
+
+        //var i = 0;
+        foreach (Content content in Model.Contents)
+        {
+
+            var contentSrc = uploadRoot + content.User_ID + "/" + content.Path;
+            var thumbSrc = uploadRoot + content.User_ID + "/thumbs/thumb_" + content.Path;
+
+            var description = content.Description;
+            try{description = description.Replace(System.Environment.NewLine, "<br/>");}catch (Exception e){Console.WriteLine(e);}
+
+            <div class="col col-lg-3 col-md-4 col-sm-6 col-xs-8" style="padding: 5px">
+                <div style="background-image: url('@thumbSrc');" class="tile" onclick="viewImage('@contentSrc','@content.Title', '@description', '@content.Content_ID');">
+                    <div class="info text-center">
+                        <h5>@Html.Partial("../Shared/_TextProcessorPartial", null, new ViewDataDictionary { { "Length", 30 }, { "Value", @content.Title } })</h5>
+                    </div>
+                </div>
+            </div>
+
+            //i++;
+            //if (i == 10)
+            //{
+            //    break;
+            //}
+        }
+    }
+
+</div>
+
+@{
+    if (Model.Contents.Count > 0)
+    {
+        <div class="text-center">
+            <a class="btn btn-info" onclick="loadMore();">Load More</a>
+        </div>
+    }
+    <script>
+
+        function loadMore() {
+            alert("Coming Soon !");
+        }
+
+    </script>
+
+}
+
+<div id="myModal" class="modal">
+    <span class="close-modal">&times;</span>
+    <img class="modal-content" id="modalImg">
+    <div id="caption">
+        <p>Image info here</p>
+    </div>
+    <a href=""></a>
+</div>
+
+<script src="~/Scripts/_ImageViewInModal.js"></script>
+
+<script>
+    function display(div) {
+        document.getElementById('form').style.display = "none";
+        document.getElementById('info').style.display = "none";
+        document.getElementById(div).style.display = "block";
+    }
+</script>
